@@ -41,7 +41,7 @@ pnpm build
 每日执行 `sh scripts/backup.sh /安全的备份目录`，默认保留 7 天。恢复前先停 API 写入，再执行：
 
 ```bash
-gzip -dc backups/lishuiwan_YYYYMMDD_HHMMSS.sql.gz | docker compose exec -T mysql mysql -uroot -p lishuiwan
+gzip -dc backups/lishuiwan_YYYYMMDD_HHMMSS.sql.gz | docker compose exec -T mysql sh -c 'exec mysql -uroot -p"$MYSQL_ROOT_PASSWORD" lishuiwan'
 ```
 
 上线前至少完成一次备份恢复演练。数据库卷、备份目录、微信商户私钥应另外做主机级加密备份。

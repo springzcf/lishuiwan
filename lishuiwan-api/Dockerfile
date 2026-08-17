@@ -6,9 +6,15 @@ COPY src ./src
 RUN mvn -B -q test package
 
 FROM eclipse-temurin:17-jre-jammy
-RUN groupadd --system app && useradd --system --gid app app && mkdir -p /app/data/uploads && chown -R app:app /app
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system app \
+    && useradd --system --gid app app \
+    && mkdir -p /app/data/uploads \
+    && chown -R app:app /app
 WORKDIR /app
 COPY --from=build /build/target/lishuiwan-api-1.0.0.jar app.jar
 USER app
 EXPOSE 8080
-ENTRYPOINT ["java","-XX:MaxRAMPercentage=75","-Duser.timezone=Asia/Shanghai","-jar","/app/app.jar","--spring.profiles.active=prod"]
+ENTRYPOINT ["java","-XX:MaxRAMPercentage=75","-XX:+ExitOnOutOfMemoryError","-Duser.timezone=Asia/Shanghai","-jar","/app/app.jar","--spring.profiles.active=prod"]
