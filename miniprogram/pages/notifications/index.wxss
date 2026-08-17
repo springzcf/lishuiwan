@@ -1,0 +1,1 @@
+.note{display:flex;gap:18rpx}.dot{width:14rpx;height:14rpx;margin-top:12rpx;border-radius:50%;background:#cf8b2f}.dot.read{background:#cbd5d1}.content{margin:14rpx 0;color:#49675e}

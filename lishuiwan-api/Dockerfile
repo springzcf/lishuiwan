@@ -1,0 +1,14 @@
+FROM maven:3.9.9-eclipse-temurin-17 AS build
+WORKDIR /build
+COPY pom.xml ./
+RUN mvn -B -q dependency:go-offline
+COPY src ./src
+RUN mvn -B -q test package
+
+FROM eclipse-temurin:17-jre-jammy
+RUN groupadd --system app && useradd --system --gid app app && mkdir -p /app/data/uploads && chown -R app:app /app
+WORKDIR /app
+COPY --from=build /build/target/lishuiwan-api-1.0.0.jar app.jar
+USER app
+EXPOSE 8080
+ENTRYPOINT ["java","-XX:MaxRAMPercentage=75","-Duser.timezone=Asia/Shanghai","-jar","/app/app.jar","--spring.profiles.active=prod"]

@@ -1,0 +1,11 @@
+.DS_Store
+.env
+secrets/
+.m2/
+**/target/
+**/node_modules/
+**/dist/
+miniprogram/env.local.js
+miniprogram/miniprogram_npm/
+data/
+*.log

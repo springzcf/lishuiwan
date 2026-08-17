@@ -1,0 +1,1 @@
+.login{padding:180rpx 64rpx;text-align:center}.mark{width:116rpx;height:116rpx;line-height:116rpx;margin:0 auto 36rpx;border-radius:36rpx;background:#0d4a3d;color:#dcb96e;font:700 64rpx/116rpx serif}.login .title{font-size:44rpx;letter-spacing:4rpx}.login .muted{margin:22rpx 0 80rpx;line-height:1.8}.privacy{font-size:22rpx;color:#a0aea9;margin-top:28rpx}

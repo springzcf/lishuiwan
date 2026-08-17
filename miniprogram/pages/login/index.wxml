@@ -1,0 +1,1 @@
+<view class="login"><view class="mark">水</view><view class="title">丽水湾洗浴中心</view><view class="muted">登录后购买会员卡、出示会员码并查看权益</view><button class="btn" loading="{{loading}}" open-type="getPhoneNumber" bindgetphonenumber="phone">手机号一键登录</button><view class="privacy">登录即表示同意《用户服务与隐私保护说明》</view></view>

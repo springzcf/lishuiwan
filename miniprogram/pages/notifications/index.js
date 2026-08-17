@@ -1,0 +1,1 @@
+const api=require('../../utils/request');Page({data:{items:[]},onShow(){this.load()},async load(){const items=await api.get('/wx/notifications');this.setData({items});if(items.some(x=>!x.isRead))api.put('/wx/notifications/read',{})}})

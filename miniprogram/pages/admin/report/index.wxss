@@ -1,0 +1,1 @@
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:18rpx;margin:24rpx 0}.metrics .card{margin:0}.metrics text{display:block;color:#7b9189}.metrics b{display:block;font-size:40rpx;color:#996a29;margin-top:15rpx}

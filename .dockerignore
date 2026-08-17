@@ -1,0 +1,10 @@
+.git
+.m2
+**/node_modules
+**/dist
+**/target
+.env
+secrets
+backups
+docs
+miniprogram

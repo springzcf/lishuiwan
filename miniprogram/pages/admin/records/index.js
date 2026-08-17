@@ -1,0 +1,1 @@
+const api=require('../../../utils/request');Page({data:{items:[]},onShow(){this.load()},onPullDownRefresh(){this.load().finally(()=>wx.stopPullDownRefresh())},async load(){this.setData({items:await api.get('/wx/staff/verifications')})}})
