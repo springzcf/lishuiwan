@@ -1,1 +1,15 @@
-<view class="page"><view class="hero admin-hero"><view class="title">现场工作台</view><view>登录身份：{{member.nickname}} · {{member.staffRole==='admin'?'管理员':'核销员'}}</view></view><view class="section-title">本班次核销人</view><input class="field" value="{{operatorName}}" placeholder="请输入姓名或工号" bindinput="name"/><button class="scan" data-mode="verify" bindtap="scan"><text class="scan-icon">▦</text><b>扫码核销</b><small>扫描顾客动态会员码</small></button><button wx:if="{{member.staffRole==='admin'}}" class="cash" data-mode="cash" bindtap="scan"><b>现金发卡</b><small>扫码识别会员并登记实收</small></button><view class="grid"><view class="card" data-url="/pages/admin/records/index" bindtap="go"><b>核销记录</b><text>查看当日与历史 ›</text></view><view wx:if="{{member.staffRole==='admin'}}" class="card" data-url="/pages/admin/report/index" bindtap="go"><b>数据速览</b><text>门店经营数据 ›</text></view></view></view>
+<view class="page admin-page">
+  <view class="hero admin-hero"><view class="title">现场工作台</view><view>登录身份：{{member.nickname}} · {{member.staffRole==='admin'?'管理员':'核销员'}}</view></view>
+  <view class="section-title">本班次核销人</view>
+  <input class="field" value="{{operatorName}}" placeholder="请输入姓名或工号" bindinput="name"/>
+  <view class="section-title">本次核销人数 / 次数</view>
+  <view class="quantity-card">
+    <button class="quantity-btn" bindtap="decrease">-</button>
+    <input class="quantity-input" type="digit" value="{{verificationQuantity}}" bindinput="quantity"/>
+    <button class="quantity-btn" bindtap="increase">+</button>
+  </view>
+  <view class="quantity-tip">例如 2 人同行，输入 2 后再扫码，一次扣减 2 次</view>
+  <button class="scan" data-mode="verify" bindtap="scan"><text class="scan-icon">▦</text><b>扫码核销 {{verificationQuantity||1}} 次</b><small>扫描顾客具体权益卡的动态核销码</small></button>
+  <button wx:if="{{member.staffRole==='admin'}}" class="cash" data-mode="cash" bindtap="scan"><b>现场购卡 / 现金发卡</b><small>扫描顾客静态会员身份码并登记实收</small></button>
+  <view class="grid"><view class="card" data-url="/pages/admin/records/index" bindtap="go"><b>核销记录</b><text>查看当日与历史 ›</text></view><view wx:if="{{member.staffRole==='admin'}}" class="card" data-url="/pages/admin/report/index" bindtap="go"><b>数据速览</b><text>门店经营数据 ›</text></view></view>
+</view>

@@ -1,3 +1,4 @@
 const env=require('../env')
 function call(path,method='GET',data,auth=true){return new Promise((resolve,reject)=>wx.request({url:env.apiBase+'/api'+path,method,data,header:{'Content-Type':'application/json',...(auth?{Authorization:`Bearer ${wx.getStorageSync('token')}`}:{})},timeout:12000,success:r=>{if(r.statusCode===401){wx.removeStorageSync('token');wx.navigateTo({url:'/pages/login/index'})}if(r.statusCode>=200&&r.statusCode<300&&r.data?.code===0)resolve(r.data.data);else{const msg=r.data?.msg||'网络请求失败';wx.showToast({title:msg,icon:'none'});reject(new Error(msg))}},fail:e=>{wx.showToast({title:'网络连接失败',icon:'none'});reject(e)}}))}
-module.exports={get:p=>call(p),post:(p,d)=>call(p,'POST',d),put:(p,d)=>call(p,'PUT',d),publicPost:(p,d)=>call(p,'POST',d,false),uuid:()=>`${Date.now()}_${Math.random().toString(36).slice(2,12)}`,env}
+function asset(url){return url&&url.startsWith('/')?env.apiBase+url:url}
+module.exports={get:p=>call(p),post:(p,d)=>call(p,'POST',d),put:(p,d)=>call(p,'PUT',d),publicPost:(p,d)=>call(p,'POST',d,false),uuid:()=>`${Date.now()}_${Math.random().toString(36).slice(2,12)}`,asset,env}

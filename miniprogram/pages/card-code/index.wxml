@@ -1,0 +1,18 @@
+<view class="code-page">
+  <view class="card-summary" wx:if="{{card}}">
+    <view class="summary-label">当前核销权益卡</view>
+    <view class="summary-name">{{card.productName||'会员权益卡'}}</view>
+    <view class="summary-id">权益卡 #{{card.id}} · 有效期至 {{card.validUntil}}</view>
+  </view>
+  <view class="code-card">
+    <view class="live-badge"><text class="pulse"></text><text>动态核销码</text></view>
+    <view class="canvas-wrap">
+      <image wx:if="{{qrImage}}" src="{{qrImage}}" class="qrcode" mode="aspectFit"></image>
+      <view wx:if="{{loading}}" class="canvas-state">正在生成核销码…</view>
+      <view wx:elif="{{error}}" class="canvas-state error" bindtap="refresh">生成失败，点击重试</view>
+    </view>
+    <view class="refresh"><text wx:if="{{qrReady}}">{{secondsToRefresh}} 秒后自动刷新</text><text wx:else>正在更新动态核销码</text></view>
+    <view class="safe-tip">此二维码仅能核销当前权益卡，请勿截图或转发</view>
+  </view>
+  <view class="usage-tip"><b>使用说明</b><text>向工作人员出示此码，扫码后选择本卡权益和核销数量。</text></view>
+</view>

@@ -1,1 +1,9 @@
-const api=require('../../utils/request');Page({data:{cards:[]},onShow(){this.load()},onPullDownRefresh(){this.load().finally(()=>wx.stopPullDownRefresh())},async load(){if(!wx.getStorageSync('token'))return;try{this.setData({cards:await api.get('/wx/cards')})}catch(e){}},detail(e){wx.navigateTo({url:`/pages/card-detail/index?id=${e.currentTarget.dataset.id}`})}})
+const api=require('../../utils/request')
+Page({
+  data:{cards:[]},
+  onShow(){this.load()},
+  onPullDownRefresh(){this.load().finally(()=>wx.stopPullDownRefresh())},
+  async load(){if(!wx.getStorageSync('token'))return;try{this.setData({cards:await api.get('/wx/cards')})}catch(e){}},
+  detail(e){wx.navigateTo({url:`/pages/card-detail/index?id=${e.currentTarget.dataset.id}`})},
+  showCode(e){wx.navigateTo({url:`/pages/card-code/index?id=${e.currentTarget.dataset.id}`})}
+})

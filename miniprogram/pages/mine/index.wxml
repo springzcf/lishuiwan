@@ -1,1 +1,73 @@
-<view class="page" wx:if="{{member}}"><view class="profile hero"><view class="avatar">{{member.nickname?member.nickname[0]:'会'}}</view><view><view class="title">{{member.nickname||'丽水湾会员'}}</view><view class="phone">{{member.phone}}</view></view></view><view class="card menu"><view class="item" data-url="/pages/member-code/index" bindtap="go"><text>▦　我的会员码</text><text>›</text></view><view class="item" data-url="/pages/orders/index" bindtap="go"><text>≡　我的订单</text><text>›</text></view><view class="item" data-url="/pages/notifications/index" bindtap="go"><text>◉　核销通知</text><text>›</text></view><view wx:if="{{member.staffRole==='verifier'||member.staffRole==='admin'}}" class="item admin" data-url="/pages/admin/home/index" bindtap="go"><text>◇　进入管理端</text><text>›</text></view></view><view class="card"><view class="item"><text>门店客服</text><text class="muted">请联系前台</text></view><view class="item"><text>注册时间</text><text class="muted">{{member.createdAt}}</text></view></view><button class="ghost" bindtap="logout">退出登录</button></view>
+<view class="page mine-page" wx:if="{{member}}">
+  <view class="hero profile-hero">
+    <view class="profile-row">
+      <view class="avatar">{{member.nickname?member.nickname[0]:'会'}}</view>
+      <view class="profile-main">
+        <view class="member-name">{{member.nickname||'丽水湾会员'}}</view>
+        <view class="member-phone">{{member.phone||'未绑定手机号'}}</view>
+        <view class="member-tag">丽水湾会员</view>
+      </view>
+      <view class="profile-actions">
+        <view class="edit-profile" bindtap="openEdit">编辑资料</view>
+        <view class="code-compact" data-url="/pages/member-code/index" bindtap="go">
+          <text class="code-mini-icon">▦</text>
+          <text>身份码</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-heading">常用服务</view>
+  <view class="quick-grid">
+    <view class="quick-card" data-url="/pages/cards/index" data-tab="true" bindtap="go">
+      <view class="quick-icon cards-icon">卡</view>
+      <view class="quick-name">我的权益</view>
+      <view class="quick-desc">查看权益卡及余量</view>
+    </view>
+    <view class="quick-card" data-url="/pages/orders/index" bindtap="go">
+      <view class="quick-icon order-icon">单</view>
+      <view class="quick-name">我的订单</view>
+      <view class="quick-desc">查看购买与支付记录</view>
+    </view>
+  </view>
+
+  <view class="section-heading">其他服务</view>
+  <view class="card service-list">
+    <view class="service-item" data-url="/pages/notifications/index" bindtap="go">
+      <view class="service-icon notice-icon">知</view>
+      <view class="service-main"><view class="service-name">核销与发卡通知</view><view class="service-desc">查看权益变动消息</view></view>
+      <view class="arrow">›</view>
+    </view>
+    <view wx:if="{{member.staffRole==='verifier'||member.staffRole==='admin'}}" class="service-item" data-url="/pages/admin/home/index" bindtap="go">
+      <view class="service-icon admin-icon">管</view>
+      <view class="service-main"><view class="service-name admin-name">进入管理端</view><view class="service-desc">扫码核销与门店管理</view></view>
+      <view class="arrow">›</view>
+    </view>
+    <view class="service-item static-item">
+      <view class="service-icon store-icon">店</view>
+      <view class="service-main"><view class="service-name">门店客服</view><view class="service-desc">如需帮助，请联系前台</view></view>
+      <view class="service-value">前台咨询</view>
+    </view>
+  </view>
+
+  <view class="account-meta">注册时间 {{member.createdAt}}</view>
+  <button class="logout" bindtap="logout">退出登录</button>
+</view>
+
+<view class="mask" wx:if="{{editing}}" bindtap="cancelEdit"></view>
+<view class="edit-sheet" wx:if="{{editing}}">
+  <view class="sheet-head">
+    <view><view class="sheet-title">编辑会员资料</view><view class="sheet-subtitle">完善资料，方便门店为您提供服务</view></view>
+    <view class="sheet-close" bindtap="cancelEdit">×</view>
+  </view>
+  <view class="form">
+    <view class="form-item"><text class="form-label">昵称</text><input class="form-input" value="{{form.nickname}}" bindinput="onNickname" placeholder="请输入昵称" maxlength="64" /></view>
+    <view class="form-item readonly"><text class="form-label">手机号</text><text class="form-static">{{member.phone||'未绑定'}}</text><text class="readonly-tip">登录账号</text></view>
+    <view class="form-item">
+      <text class="form-label">生日</text>
+      <picker class="form-control" mode="date" value="{{form.birthday}}" bindchange="onBirthday"><view class="form-picker {{form.birthday?'':'placeholder'}}">{{form.birthday||'请选择生日'}}<text>›</text></view></picker>
+    </view>
+    <view class="form-item form-item-block"><text class="form-label">联系地址</text><textarea class="form-textarea" value="{{form.address}}" bindinput="onAddress" placeholder="请输入地址（选填）" maxlength="255" /></view>
+  </view>
+  <button class="save-btn" loading="{{saving}}" bindtap="save">保存资料</button>
+</view>

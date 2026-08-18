@@ -1,1 +1,1 @@
-.note{display:flex;gap:18rpx}.dot{width:14rpx;height:14rpx;margin-top:12rpx;border-radius:50%;background:#cf8b2f}.dot.read{background:#cbd5d1}.content{margin:14rpx 0;color:#49675e}
+.note{display:flex;gap:18rpx}.dot{width:14rpx;height:14rpx;margin-top:12rpx;border-radius:50%;background:#c79540;box-shadow:0 0 0 6rpx rgba(199,149,64,.11)}.dot.read{background:#cbd1ce;box-shadow:none}.content{margin:14rpx 0;color:#49675e}

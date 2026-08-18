@@ -1,1 +1,13 @@
-<view class="page" wx:if="{{card}}"><view class="hero"><view class="title">权益卡 #{{card.id}}</view><view class="muted-light">{{card.validFrom}} 至 {{card.validUntil}}</view></view><view class="section-title">剩余权益</view><view class="card"><view class="benefit row" wx:for="{{card.benefits}}" wx:key="benefitId"><text>{{item.item}}</text><b>{{item.type==='unlimited'?'不限次':item.remaining+(item.type==='hours'?' 小时':' 次')}}</b></view></view><view class="section-title">使用记录</view><view wx:if="{{!records.length}}" class="empty">尚未使用</view><view class="record card" wx:for="{{records}}" wx:key="id"><view class="row"><b>{{item.itemSnapshot}}</b><text class="danger">-{{item.quantity}}</text></view><view class="muted">{{item.createdAt}} · 核销人 {{item.operatorName}}</view></view></view>
+<view class="page" wx:if="{{card}}">
+  <view class="hero card-hero">
+    <view class="title">{{card.productName||'会员权益卡'}}</view>
+    <view class="muted-light">权益卡 #{{card.id}} · {{card.validFrom}} 至 {{card.validUntil}}</view>
+    <view wx:if="{{card.status==='unused'||card.status==='using'}}" class="show-code" bindtap="showCode"><text class="code-icon">▦</text><view><b>出示动态核销码</b><small>工作人员扫码后核销本卡权益</small></view><text class="code-arrow">›</text></view>
+    <view wx:else class="code-disabled">该权益卡当前不可核销</view>
+  </view>
+  <view class="section-title">剩余权益</view>
+  <view class="card"><view class="benefit row" wx:for="{{card.benefits}}" wx:key="benefitId"><text>{{item.item}}</text><b>{{item.type==='unlimited'?'不限次':item.remaining+(item.type==='hours'?' 小时':' 次')}}</b></view></view>
+  <view class="section-title">使用记录</view>
+  <view wx:if="{{!records.length}}" class="empty">尚未使用</view>
+  <view class="record card" wx:for="{{records}}" wx:key="id"><view class="row"><b>{{item.itemSnapshot}}</b><text class="danger">-{{item.quantity}}</text></view><view class="muted">{{item.createdAt}} · 核销人 {{item.operatorName}}</view></view>
+</view>

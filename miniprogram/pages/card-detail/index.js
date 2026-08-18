@@ -1,1 +1,8 @@
-const api=require('../../utils/request');Page({data:{card:null,records:[]},onLoad(o){this.id=o.id;this.load()},async load(){const r=await api.get(`/wx/cards/${this.id}`);this.setData({card:r.card,records:r.verifications})}})
+const api=require('../../utils/request')
+Page({
+  data:{card:null,records:[]},
+  onLoad(o){this.id=o.id},
+  onShow(){this.load()},
+  async load(){const r=await api.get(`/wx/cards/${this.id}`);this.setData({card:r.card,records:r.verifications})},
+  showCode(){wx.navigateTo({url:`/pages/card-code/index?id=${this.id}`})}
+})

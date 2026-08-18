@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/lishuiwan?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
+    username: lishuiwan
+    password: lishuiwan_dev
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: lishuiwan_dev
+server:
+  port: 8080
+lishuiwan:
+  dev-login-enabled: true
+  mock-payment-enabled: true
+  jwt:
+    secret: local-development-secret-only-please-never-use-in-production
+  wechat:
+    pay:
+      enabled: false
+  upload:
+    directory: ./data/uploads
+    url-prefix: /static/
+
+INITIAL_ADMIN_USERNAME: admin
+INITIAL_ADMIN_PASSWORD: local-admin-123456
+INITIAL_ADMIN_NAME: 本地管理员

@@ -1,0 +1,1 @@
+ALTER TABLE t_member ADD COLUMN birthday VARCHAR(10) NULL AFTER avatar, ADD COLUMN address VARCHAR(255) NULL AFTER birthday;

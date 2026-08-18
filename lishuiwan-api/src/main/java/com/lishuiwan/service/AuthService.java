@@ -39,6 +39,6 @@ public class AuthService {
     return Map.of("token",tokens.admin(a.getId()),"admin",Map.of("id",a.getId(),"username",a.getUsername(),"name",a.getName()));
   }
   private void ensureActive(Member m){if(m.getStatus()!=0)throw new BizException(40302,"会员账号已禁用");}
-  public Map<String,Object> safe(Member m){return Map.of("id",m.getId(),"phone",mask(m.getPhone()),"nickname",m.getNickname()==null?"":m.getNickname(),"avatar",m.getAvatar()==null?"":m.getAvatar(),"staffRole",m.getStaffRole(),"createdAt",m.getCreatedAt()==null?"":m.getCreatedAt().toString());}
+  public Map<String,Object> safe(Member m){return Map.of("id",m.getId(),"phone",mask(m.getPhone()),"nickname",m.getNickname()==null?"":m.getNickname(),"avatar",m.getAvatar()==null?"":m.getAvatar(),"birthday",m.getBirthday()==null?"":m.getBirthday(),"address",m.getAddress()==null?"":m.getAddress(),"staffRole",m.getStaffRole(),"createdAt",m.getCreatedAt()==null?"":m.getCreatedAt().toString());}
   private String mask(String p){return p==null?"":p.replaceAll("(\\d{3})\\d{4}(\\d{4})","$1****$2");}
 }

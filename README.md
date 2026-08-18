@@ -12,6 +12,8 @@
 
 ## 本地验证
 
+完整的本地联调步骤见 [`docs/本地调试指南.md`](docs/本地调试指南.md)。本地模式支持开发微信账号、开发手机号、模拟支付、图片上传访问和 Vue 热更新，不需要真实微信支付即可跑通购买、发卡与核销主流程。
+
 ```bash
 cd lishuiwan-api
 mvn -s ../.mvn/settings.xml test

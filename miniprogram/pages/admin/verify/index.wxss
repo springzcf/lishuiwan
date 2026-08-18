@@ -1,1 +1,1 @@
-.confirm .row{padding:12rpx 0}
+.admin-page{min-height:100vh;box-sizing:border-box;background:#eef4f8;color:#18344c}.admin-page .card{border-color:#dbe7ee}.admin-page .section-title{color:#203f59}.admin-page .field{background:#fff;border-color:#d8e5ed}.admin-page .btn{background:linear-gradient(135deg,#2d739c,#174b70)!important;color:#fff!important;box-shadow:0 10rpx 24rpx rgba(32,91,130,.2)}.confirm .row{padding:12rpx 0}.confirm b{color:#245d84}.quantity-confirm{text-align:center;font-size:36rpx;font-weight:700;color:#245d84}

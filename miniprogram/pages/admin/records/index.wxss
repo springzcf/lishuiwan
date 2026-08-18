@@ -1,1 +1,1 @@
-.muted{margin-top:12rpx}
+.admin-page{min-height:100vh;box-sizing:border-box;background:#eef4f8;color:#18344c}.admin-page .card{border-color:#dbe7ee}.admin-page .danger{color:#c45454}.muted{margin-top:12rpx;color:#728a99}

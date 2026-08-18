@@ -1,1 +1,16 @@
-const api=require('../../../utils/request');Page({data:{member:null,cards:[],cardIndex:0,benefitIndex:0,quantity:1,operatorName:'',submitting:false},onLoad(){const p=getApp().globalData.pendingMemberCode;if(!p){wx.navigateBack();return}this.pending=p;this.setData({member:p.parsed.member,cards:p.parsed.cards,operatorName:p.operatorName})},cardChange(e){this.setData({cardIndex:Number(e.detail.value),benefitIndex:0})},benefitChange(e){this.setData({benefitIndex:Number(e.detail.value)})},quantity(e){this.setData({quantity:e.detail.value})},async submit(){const card=this.data.cards[this.data.cardIndex],benefit=card&&card.benefits[this.data.benefitIndex];if(!benefit){wx.showToast({title:'没有可用权益',icon:'none'});return}const ok=await new Promise(r=>wx.showModal({title:'确认核销',content:`${benefit.item} ${this.data.quantity}${benefit.type==='hours'?'小时':'次'}`,success:x=>r(x.confirm)}));if(!ok)return;this.setData({submitting:true});try{await api.post('/wx/staff/verifications',{requestNo:api.uuid(),memberCodeToken:this.pending.token,cardId:card.id,benefitId:benefit.benefitId,quantity:Number(this.data.quantity),operatorName:this.pending.operatorName});getApp().globalData.pendingMemberCode=null;wx.showToast({title:'核销成功'});setTimeout(()=>wx.navigateBack(),1000)}finally{this.setData({submitting:false})}}})
+const api=require('../../../utils/request')
+Page({
+  data:{member:null,card:null,benefitIndex:0,quantity:1,operatorName:'',submitting:false},
+  onLoad(){const p=getApp().globalData.pendingScan;if(!p){wx.navigateBack();return}this.pending=p;this.setData({member:p.parsed.member,card:p.parsed.card,operatorName:p.operatorName,quantity:p.quantity||1})},
+  benefitChange(e){this.setData({benefitIndex:Number(e.detail.value)})},
+  quantity(e){this.setData({quantity:e.detail.value})},
+  async submit(){
+    const card=this.data.card,benefit=card&&card.benefits[this.data.benefitIndex]
+    if(!benefit){wx.showToast({title:'没有可用权益',icon:'none'});return}
+    const quantity=Number(this.data.quantity)
+    if(!Number.isFinite(quantity)||quantity<=0){wx.showToast({title:'请输入正确的核销数量',icon:'none'});return}
+    const ok=await new Promise(r=>wx.showModal({title:'确认核销',content:`${card.productName||'权益卡'}\n${benefit.item} ${quantity}${benefit.type==='hours'?'小时':'次'}`,success:x=>r(x.confirm)}));if(!ok)return
+    this.setData({submitting:true})
+    try{await api.post('/wx/staff/verifications',{requestNo:api.uuid(),cardCodeToken:this.pending.token,cardId:card.id,benefitId:benefit.benefitId,quantity,operatorName:this.pending.operatorName});getApp().globalData.pendingScan=null;wx.setStorageSync('verificationQuantity',1);wx.showToast({title:`已核销 ${quantity} ${benefit.type==='hours'?'小时':'次'}`});setTimeout(()=>wx.navigateBack(),1000)}finally{this.setData({submitting:false})}
+  }
+})

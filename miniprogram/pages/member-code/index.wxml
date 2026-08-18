@@ -1,1 +1,24 @@
-<view class="code-page"><view class="code-card"><view class="title">到店会员码</view><view class="muted">供工作人员扫码核销或现金发卡</view><view class="canvas-wrap"><canvas canvas-id="qrcode" style="width:520rpx;height:520rpx" width="520" height="520"/></view><view class="refresh"><text class="pulse"></text> 动态更新中，请勿截图转发</view></view><button class="ghost notice" bindtap="subscribe">开启核销与发卡提醒</button><view class="tip">会员码仅短时有效，成功使用后立即失效</view></view>
+<view class="code-page">
+  <view class="code-intro">
+    <view class="intro-eyebrow">MEMBER ID</view>
+    <view class="intro-title">会员身份码</view>
+    <view class="intro-desc">现场购卡或发卡时，向工作人员出示</view>
+  </view>
+
+  <view class="code-card">
+    <view class="live-badge"><text class="id-dot">ID</text><text>会员身份识别</text></view>
+    <view class="canvas-wrap">
+      <image wx:if="{{qrImage}}" src="{{qrImage}}" class="qrcode" mode="aspectFit"></image>
+      <view wx:if="{{loading}}" class="canvas-state">正在生成会员码…</view>
+      <view wx:elif="{{error}}" class="canvas-state error" bindtap="refresh">生成失败，点击重试</view>
+    </view>
+    <view class="refresh">此码长期有效，无需刷新</view>
+    <view class="safe-tip">仅用于现场购卡、现金发卡和会员身份识别</view>
+  </view>
+  <view class="notice-card" bindtap="subscribe">
+    <view class="notice-icon">知</view>
+    <view class="notice-main"><view class="notice-title">开启服务提醒</view><view class="notice-desc">及时接收核销与发卡结果</view></view>
+    <view class="notice-arrow">›</view>
+  </view>
+  <view class="tip">权益核销请前往具体权益卡，出示该卡的动态核销码</view>
+</view>
