@@ -11,7 +11,7 @@ public class AdminController {
   private final OrderMapper orders; private final VerificationMapper verifications; private final AdminUserMapper admins; private final AppProperties properties; private final OrderService orderService;
   public AdminController(AdminService service,CatalogService catalog,ActivityMapper activities,MemberMapper members,OrderMapper orders,VerificationMapper verifications,AdminUserMapper admins,AppProperties properties,OrderService orderService){this.service=service;this.catalog=catalog;this.activities=activities;this.members=members;this.orders=orders;this.verifications=verifications;this.admins=admins;this.properties=properties;this.orderService=orderService;}
   public record StatusRequest(@NotNull Integer status){}
-  public record StaffRequest(@NotNull Long memberId,@NotBlank String staffRole){}
+  public record StaffRequest(@NotNull Long memberId,@NotBlank String staffRole,String pin){}
   public record AdminRequest(@NotBlank String username,String password,@NotBlank String name,Integer status){}
   @GetMapping("/products") public ApiResponse<List<Map<String,Object>>> products(){return ApiResponse.ok(catalog.products(false));}
   @PostMapping("/products") public ApiResponse<CardProduct> createProduct(@RequestBody Map<String,Object> body){return ApiResponse.ok(service.saveProduct(null,body,RequestActor.adminId()));}
@@ -28,11 +28,13 @@ public class AdminController {
   @GetMapping("/orders/{id}") public ApiResponse<Map<String,Object>> order(@PathVariable long id){OrderEntity o=orders.selectById(id);if(o==null)throw BizException.notFound("订单");return ApiResponse.ok(orderService.view(o));}
   @GetMapping("/verifications") public ApiResponse<List<Verification>> verificationList(){return ApiResponse.ok(verifications.selectList(new LambdaQueryWrapper<Verification>().orderByDesc(Verification::getId).last("limit 1000")));}
   @GetMapping("/staff") public ApiResponse<List<Map<String,Object>>> staff(){return ApiResponse.ok(members.selectList(new LambdaQueryWrapper<Member>().ne(Member::getStaffRole,"customer").orderByDesc(Member::getId)).stream().map(this::memberView).toList());}
-  @PostMapping("/staff") public ApiResponse<Void> staff(@Valid @RequestBody StaffRequest r){service.grant(RequestActor.adminId(),r.memberId(),r.staffRole());return ApiResponse.ok(null);}
-  @DeleteMapping("/staff/{memberId}") public ApiResponse<Void> revoke(@PathVariable long memberId){service.grant(RequestActor.adminId(),memberId,"customer");return ApiResponse.ok(null);}
+  @PostMapping("/staff") public ApiResponse<Void> staff(@Valid @RequestBody StaffRequest r){service.grant(RequestActor.adminId(),r.memberId(),r.staffRole(),r.pin());return ApiResponse.ok(null);}
+  @DeleteMapping("/staff/{memberId}") public ApiResponse<Void> revoke(@PathVariable long memberId){service.grant(RequestActor.adminId(),memberId,"customer",null);return ApiResponse.ok(null);}
   @GetMapping("/reports/overview") public ApiResponse<Map<String,Object>> overview(){return ApiResponse.ok(service.overview());}
   @GetMapping("/reports/sales") public ApiResponse<List<Map<String,Object>>> sales(){return ApiResponse.ok(service.salesTrend());}
-  @GetMapping("/reports/category") public ApiResponse<List<Map<String,Object>>> category(){return ApiResponse.ok(service.categoryReport());}
+  @GetMapping("/reports/verification-trend") public ApiResponse<List<Map<String,Object>>> verificationTrend(@RequestParam(required=false) LocalDateTime from,@RequestParam(required=false) LocalDateTime to){return ApiResponse.ok(service.verificationTrend(from,to));}
+  @GetMapping("/reports/sales-by-method") public ApiResponse<List<Map<String,Object>>> salesByMethod(@RequestParam(required=false) LocalDateTime from,@RequestParam(required=false) LocalDateTime to){return ApiResponse.ok(service.salesByMethod(from,to));}
+  @GetMapping("/reports/category") public ApiResponse<List<Map<String,Object>>> category(@RequestParam(required=false) LocalDateTime from,@RequestParam(required=false) LocalDateTime to){return ApiResponse.ok(service.categoryReport(from,to));}
   @GetMapping("/admin-users") public ApiResponse<List<Map<String,Object>>> adminList(){return ApiResponse.ok(admins.selectList(new LambdaQueryWrapper<AdminUser>().orderByAsc(AdminUser::getId)).stream().map(a->Map.<String,Object>of("id",a.getId(),"username",a.getUsername(),"name",a.getName(),"status",a.getStatus())).toList());}
   @PostMapping("/admin-users") public ApiResponse<AdminUser> createAdmin(@Valid @RequestBody AdminRequest r){return ApiResponse.ok(service.saveAdmin(null,r.username(),r.password(),r.name(),r.status(),RequestActor.adminId()));}
   @PutMapping("/admin-users/{id}") public ApiResponse<AdminUser> updateAdmin(@PathVariable long id,@Valid @RequestBody AdminRequest r){return ApiResponse.ok(service.saveAdmin(id,r.username(),r.password(),r.name(),r.status(),RequestActor.adminId()));}

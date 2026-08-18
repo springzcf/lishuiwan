@@ -16,10 +16,15 @@
   </view>
 
   <view class="step-card card {{!member?'step-disabled':''}}">
-    <view class="step-head"><text class="step-no">3</text><view><b>管理员授权</b><text>输入启用状态的 Web 管理员密码</text></view></view>
-    <input class="field password" password value="{{adminPassword}}" disabled="{{!member}}" maxlength="72" placeholder="请输入管理员密码" bindinput="password"/>
+    <view class="step-head"><text class="step-no">3</text><view><b>操作员授权</b><text>输入您本人的操作密码确认发卡</text></view></view>
+    <block wx:if="{{hasPin}}">
+      <input class="field password" password value="{{staffPin}}" disabled="{{!member}}" maxlength="6" placeholder="请输入您的操作密码" bindinput="pin"/>
+    </block>
+    <block wx:else>
+      <view class="pin-empty">尚未设置操作密码，请联系后台管理员在授权时为您设置。</view>
+    </block>
   </view>
 
-  <button class="btn submit-btn" disabled="{{productIndex<0||!member||!adminPassword}}" loading="{{submitting}}" bindtap="submit">确认收款并发卡</button>
-  <view class="security-tip">密码仅用于本次服务端安全校验，不会保存在小程序中。</view>
+  <button class="btn submit-btn" disabled="{{productIndex<0||!member||!hasPin||!staffPin}}" loading="{{submitting}}" bindtap="submit">确认收款并发卡</button>
+  <view class="security-tip">操作密码仅用于本次服务端安全校验，不会保存在小程序中。</view>
 </view>

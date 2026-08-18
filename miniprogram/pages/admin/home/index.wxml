@@ -22,7 +22,7 @@
     <view class="section-head sales-head"><view><b>现场购卡</b><text>为顾客办理新卡</text></view></view>
     <view class="cash-entry card" bindtap="cashIssue">
       <view class="cash-icon">卡</view>
-      <view class="cash-main"><b>现场收款并发卡</b><text>选择卡券、扫描会员码、管理员授权</text></view>
+      <view class="cash-main"><b>现场收款并发卡</b><text>选择卡券、扫描会员码、操作密码授权</text></view>
       <view class="entry-action">办理 <text>›</text></view>
     </view>
   </block>
