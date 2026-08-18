@@ -36,7 +36,20 @@ pnpm build
 7. 微信公众平台配置 request 合法域名和支付回调域名，均必须为 HTTPS；小程序 `env.js` 必须指向同一正式 API 域名。
 8. 如启用订阅消息，在微信后台申请核销/发卡模板，将模板 ID 同时写入 `.env` 与小程序 `env.js`；模板中的事项、时间字段名分别通过 `WECHAT_TEMPLATE_THING_KEY`、`WECHAT_TEMPLATE_TIME_KEY` 配置。
 
-生产配置会强制关闭开发登录和模拟支付；未替换 JWT 密钥或缺少微信参数时，`prod` 启动会直接失败。
+生产配置会强制关闭开发登录和模拟支付；未提供安全的 JWT/数据库密码时，`prod` 启动会直接失败。微信参数会在首次调用微信能力时校验并返回明确错误。
+
+## 微信云托管部署
+
+后端目录已经按微信云托管 Spring Boot 模板适配，可直接将 `lishuiwan-api` 作为构建根目录发布：
+
+1. 在微信云托管创建服务，代码目录选择 `lishuiwan-api`，构建方式选择 Dockerfile，监听端口填写 `80`。
+2. 模板部署会读取 `container.config.json`，创建 `lishuiwan` 数据库；服务启动后 Flyway 会自动创建和升级业务表。
+3. 云托管自动注入的 `MYSQL_ADDRESS`、`MYSQL_USERNAME`、`MYSQL_PASSWORD` 可直接被应用识别，也仍兼容原有的 `DB_URL`、`DB_USERNAME`、`DB_PASSWORD`。
+4. 首次部署可使用云数据库密码派生 JWT 签名密钥；正式运营请单独配置至少 32 字节的 `JWT_SECRET`。
+5. 使用微信登录前配置 `WECHAT_APP_ID`、`WECHAT_APP_SECRET`；使用验证码、订阅消息等功能还需配置可访问的 Redis：`REDIS_HOST`、`REDIS_PORT`、`REDIS_PASSWORD`。
+6. 如需初始化后台管理员，配置 `INITIAL_ADMIN_USERNAME`、长度至少 12 位的 `INITIAL_ADMIN_PASSWORD` 和可选的 `INITIAL_ADMIN_NAME`。
+
+手动上传代码包时，`container.config.json` 不会覆盖控制台已有的服务设置；请确认控制台端口仍为 `80`。容器本地文件不是持久存储，正式环境的上传文件应另接对象存储或持久卷。
 
 ## 备份与恢复
 

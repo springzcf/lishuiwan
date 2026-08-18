@@ -1,5 +1,5 @@
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:80}
   shutdown: graceful
   forward-headers-strategy: framework
 spring:
@@ -8,9 +8,9 @@ spring:
   lifecycle:
     timeout-per-shutdown-phase: 30s
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/lishuiwan?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true}
-    username: ${DB_USERNAME:lishuiwan}
-    password: ${DB_PASSWORD:change-me}
+    url: ${DB_URL:jdbc:mysql://${MYSQL_ADDRESS:localhost:3306}/${MYSQL_DATABASE:lishuiwan}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${DB_USERNAME:${MYSQL_USERNAME:lishuiwan}}
+    password: ${DB_PASSWORD:${MYSQL_PASSWORD:change-me}}
     hikari:
       maximum-pool-size: ${DB_POOL_SIZE:20}
       minimum-idle: 2
@@ -53,7 +53,8 @@ lishuiwan:
   mock-payment-enabled: ${MOCK_PAYMENT_ENABLED:false}
   dev-login-enabled: ${DEV_LOGIN_ENABLED:false}
   jwt:
-    secret: ${JWT_SECRET:replace-with-at-least-32-random-bytes}
+    # 云托管首次部署可复用平台注入的数据库密码；正式运营建议单独设置 JWT_SECRET。
+    secret: ${JWT_SECRET:lishuiwan-wxcloud-derived-jwt-secret-${MYSQL_PASSWORD:replace-with-at-least-32-random-bytes}}
     member-expire-seconds: ${JWT_MEMBER_EXPIRE:604800}
     admin-expire-seconds: ${JWT_ADMIN_EXPIRE:7200}
   wechat:

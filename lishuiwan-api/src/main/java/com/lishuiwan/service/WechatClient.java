@@ -37,6 +37,12 @@ public class WechatClient {
     if(node==null||!node.hasNonNull("access_token"))throw new BizException(50001,"微信服务暂不可用");
     String token=node.get("access_token").asText(); redis.opsForValue().set(key,token,Duration.ofSeconds(Math.max(60,node.path("expires_in").asLong(7200)-300))); return token;
   }
-  private void requireConfig(){ if(p.getWechat().getAppId()==null||p.getWechat().getAppId().isBlank())throw new BizException(50002,"微信参数未配置"); }
+  private void requireConfig(){
+    if (p.getWechat().getAppId() == null || p.getWechat().getAppId().isBlank()
+        || p.getWechat().getAppSecret() == null || p.getWechat().getAppSecret().isBlank()
+        || p.getWechat().getAppSecret().contains("change-me")) {
+      throw new BizException(50002,"微信参数未配置");
+    }
+  }
   private String truncate(String v,int max){return v==null?"":v.substring(0,Math.min(v.length(),max));}
 }

@@ -1,0 +1,28 @@
+{
+  "containerPort": 80,
+  "minNum": 0,
+  "maxNum": 5,
+  "cpu": 1,
+  "mem": 2,
+  "policyType": "cpu",
+  "policyThreshold": 50,
+  "policyDetails": [
+    {
+      "PolicyType": "cpu",
+      "PolicyThreshold": 50
+    },
+    {
+      "PolicyType": "mem",
+      "PolicyThreshold": 50
+    }
+  ],
+  "envParams": {
+    "SERVER_PORT": "80",
+    "MYSQL_DATABASE": "lishuiwan"
+  },
+  "customLogs": "stdout",
+  "dataBaseName": "lishuiwan",
+  "executeSQLs": [
+    "CREATE DATABASE IF NOT EXISTS lishuiwan DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+  ]
+}
