@@ -11,6 +11,7 @@ import io.jsonwebtoken.Claims;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -37,6 +38,11 @@ public class AuthService {
     AdminUser a=admins.selectOne(new LambdaQueryWrapper<AdminUser>().eq(AdminUser::getUsername,username));
     if(a==null||a.getStatus()!=0||!passwords.matches(password,a.getPassword()))throw new BizException(40005,"账号或密码错误");
     return Map.of("token",tokens.admin(a.getId()),"admin",Map.of("id",a.getId(),"username",a.getUsername(),"name",a.getName()));
+  }
+  public void requireActiveAdminPassword(String password){
+    List<AdminUser> active=admins.selectList(new LambdaQueryWrapper<AdminUser>().eq(AdminUser::getStatus,0));
+    boolean matched=active.stream().anyMatch(admin->passwords.matches(password,admin.getPassword()));
+    if(!matched)throw new BizException(40005,"管理员密码错误");
   }
   private void ensureActive(Member m){if(m.getStatus()!=0)throw new BizException(40302,"会员账号已禁用");}
   public Map<String,Object> safe(Member m){return Map.of("id",m.getId(),"phone",mask(m.getPhone()),"nickname",m.getNickname()==null?"":m.getNickname(),"avatar",m.getAvatar()==null?"":m.getAvatar(),"birthday",m.getBirthday()==null?"":m.getBirthday(),"address",m.getAddress()==null?"":m.getAddress(),"staffRole",m.getStaffRole(),"createdAt",m.getCreatedAt()==null?"":m.getCreatedAt().toString());}

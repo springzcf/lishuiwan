@@ -9,11 +9,11 @@ public class StaffController {
   public StaffController(StaffService staff,VerificationService verification,CashIssueService cash,AdminService admin){this.staff=staff;this.verification=verification;this.cash=cash;this.admin=admin;}
   public record ParseRequest(@NotBlank String token){}
   public record VerifyRequest(@NotBlank String requestNo,@NotBlank String cardCodeToken,@NotNull Long cardId,@NotBlank String benefitId,@NotNull @DecimalMin("0.01") BigDecimal quantity,@NotBlank @Size(max=50) String operatorName){}
-  public record CashRequest(@NotBlank String requestNo,@NotBlank String memberCodeToken,@NotNull Long productId,@NotNull @DecimalMin("0.01") BigDecimal paidAmount){}
+  public record CashRequest(@NotBlank String requestNo,@NotBlank String memberCodeToken,@NotNull Long productId,@NotNull @DecimalMin("0.01") BigDecimal paidAmount,@NotBlank @Size(max=72) String adminPassword){}
   @PostMapping("/member-codes/parse") public ApiResponse<Map<String,Object>> parseMember(@Valid @RequestBody ParseRequest r){staff.require(RequestActor.memberId(),true);return ApiResponse.ok(cash.parseMember(r.token()));}
   @PostMapping("/card-codes/parse") public ApiResponse<Map<String,Object>> parseCard(@Valid @RequestBody ParseRequest r){staff.require(RequestActor.memberId(),false);return ApiResponse.ok(verification.parse(r.token()));}
   @PostMapping("/verifications") public ApiResponse<Map<String,Object>> verify(@Valid @RequestBody VerifyRequest r){long id=RequestActor.memberId();staff.require(id,false);return ApiResponse.ok(verification.verify(id,r.requestNo(),r.cardCodeToken(),r.cardId(),r.benefitId(),r.quantity(),r.operatorName()));}
-  @PostMapping("/cash-orders") public ApiResponse<Map<String,Object>> cash(@Valid @RequestBody CashRequest r){long id=RequestActor.memberId();staff.require(id,true);return ApiResponse.ok(cash.issue(id,r.requestNo(),r.memberCodeToken(),r.productId(),r.paidAmount()));}
+  @PostMapping("/cash-orders") public ApiResponse<Map<String,Object>> cash(@Valid @RequestBody CashRequest r){long id=RequestActor.memberId();staff.require(id,true);return ApiResponse.ok(cash.issue(id,r.requestNo(),r.memberCodeToken(),r.productId(),r.paidAmount(),r.adminPassword()));}
   @GetMapping("/verifications") public ApiResponse<List<Verification>> records(){staff.require(RequestActor.memberId(),false);return ApiResponse.ok(verification.records());}
   @GetMapping("/reports/summary") public ApiResponse<Map<String,Object>> summary(){staff.require(RequestActor.memberId(),true);return ApiResponse.ok(admin.overview());}
 }

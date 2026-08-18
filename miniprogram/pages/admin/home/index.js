@@ -10,14 +10,13 @@ Page({
   setQuantity(value){this.setData({verificationQuantity:value});wx.setStorageSync('verificationQuantity',value)},
   async scan(e){
     if(!this.data.operatorName.trim()){wx.showToast({title:'请先填写核销人',icon:'none'});return}
-    const mode=e.currentTarget.dataset.mode
     const quantity=Number(this.data.verificationQuantity)
-    if(mode==='verify'&&(!Number.isFinite(quantity)||quantity<=0)){wx.showToast({title:'请输入正确的核销数量',icon:'none'});return}
+    if(!Number.isFinite(quantity)||quantity<=0){wx.showToast({title:'请输入正确的核销数量',icon:'none'});return}
     const scan=await new Promise((resolve,reject)=>wx.scanCode({onlyFromCamera:true,scanType:['qrCode'],success:resolve,fail:reject}))
-    const endpoint=mode==='cash'?'/wx/staff/member-codes/parse':'/wx/staff/card-codes/parse'
-    const parsed=await api.post(endpoint,{token:scan.result})
-    getApp().globalData.pendingScan={token:scan.result,parsed,operatorName:this.data.operatorName,quantity:mode==='verify'?quantity:undefined}
-    wx.navigateTo({url:mode==='cash'?'/pages/admin/cash-issue/index':'/pages/admin/verify/index'})
+    const parsed=await api.post('/wx/staff/card-codes/parse',{token:scan.result})
+    getApp().globalData.pendingScan={token:scan.result,parsed,operatorName:this.data.operatorName,quantity}
+    wx.navigateTo({url:'/pages/admin/verify/index'})
   },
+  cashIssue(){wx.navigateTo({url:'/pages/admin/cash-issue/index'})},
   go(e){wx.navigateTo({url:e.currentTarget.dataset.url})}
 })

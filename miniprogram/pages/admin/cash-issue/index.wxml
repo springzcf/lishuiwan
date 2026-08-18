@@ -1,1 +1,25 @@
-<view class="page admin-page"><view class="card"><view class="muted">发卡会员</view><view class="row member"><b>{{member.nickname}}</b><text>{{member.phone}}</text></view></view><view class="section-title">卡商品</view><picker range="{{products}}" range-key="name" value="{{productIndex}}" bindchange="productChange"><view class="field row"><text>{{products[productIndex].name}}</text><text>¥{{products[productIndex].currentPrice}} ›</text></view></picker><view class="section-title">实收现金金额</view><input class="field amount" type="digit" value="{{paidAmount}}" bindinput="amount"/><view class="muted warning">实收金额与售价不一致时会记录差额，请确认线下收款无误。</view><button class="btn" loading="{{submitting}}" bindtap="submit">确认收款并发卡</button></view>
+<view class="page admin-page">
+  <view class="flow-tip">请依次完成以下 3 步</view>
+
+  <view class="step-card card">
+    <view class="step-head"><text class="step-no">1</text><view><b>选择卡券类型</b><text>确定本次需要发放的卡券</text></view></view>
+    <picker range="{{products}}" range-key="name" value="{{productIndex}}" bindchange="productChange">
+      <view class="field row product-picker"><text class="{{productIndex<0?'placeholder':''}}">{{productIndex<0?'请选择卡券类型':products[productIndex].name}}</text><text>{{productIndex<0?'选择 ›':'¥'+products[productIndex].currentPrice+' ›'}}</text></view>
+    </picker>
+    <block wx:if="{{productIndex>=0}}"><view class="amount-label">实收金额</view><input class="field amount" type="digit" value="{{paidAmount}}" bindinput="amount"/><view class="muted amount-tip">如实收金额与售价不同，系统将记录差额。</view></block>
+  </view>
+
+  <view class="step-card card {{productIndex<0?'step-disabled':''}}">
+    <view class="step-head"><text class="step-no">2</text><view><b>扫描会员码</b><text>扫描顾客“我的”页面中的会员身份码</text></view></view>
+    <view wx:if="{{member}}" class="member-result"><view class="member-avatar">{{member.nickname?member.nickname[0]:'会'}}</view><view class="member-main"><b>{{member.nickname||'丽水湾会员'}}</b><text>{{member.phone}}</text></view><text class="verified">已识别</text></view>
+    <button class="scan-member" disabled="{{productIndex<0||scanning}}" loading="{{scanning}}" bindtap="scanMember">{{member?'重新扫描会员码':'扫描会员码'}}</button>
+  </view>
+
+  <view class="step-card card {{!member?'step-disabled':''}}">
+    <view class="step-head"><text class="step-no">3</text><view><b>管理员授权</b><text>输入启用状态的 Web 管理员密码</text></view></view>
+    <input class="field password" password value="{{adminPassword}}" disabled="{{!member}}" maxlength="72" placeholder="请输入管理员密码" bindinput="password"/>
+  </view>
+
+  <button class="btn submit-btn" disabled="{{productIndex<0||!member||!adminPassword}}" loading="{{submitting}}" bindtap="submit">确认收款并发卡</button>
+  <view class="security-tip">密码仅用于本次服务端安全校验，不会保存在小程序中。</view>
+</view>
