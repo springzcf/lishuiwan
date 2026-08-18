@@ -1,1 +1,12 @@
-<view class="page admin-page"><view wx:if="{{!items.length}}" class="empty">暂无核销记录</view><view class="card" wx:for="{{items}}" wx:key="id"><view class="row"><b>{{item.itemSnapshot}}</b><text class="danger">-{{item.quantity}}</text></view><view class="muted">会员 {{item.memberId}} · 权益卡 {{item.cardId}}</view><view class="muted">{{item.createdAt}} · {{item.operatorName}}</view></view></view>
+<view class="page admin-page">
+  <view wx:if="{{!items.length}}" class="empty">暂无核销记录</view>
+  <view class="record-card card" wx:for="{{items}}" wx:key="id">
+    <view class="record-head"><view><b>{{item.productName}}</b><text>#{{item.cardId}}</text></view><view class="deduction">-{{item.quantity}}</view></view>
+    <view class="benefit-line"><text class="benefit-tag">核销项目</text><b>{{item.itemSnapshot}}</b></view>
+    <view class="customer-block">
+      <view class="info-row"><text>会员</text><b>{{item.memberName}}</b></view>
+      <view class="info-row"><text>手机号</text><b class="phone">{{item.memberPhone||'未绑定'}}</b></view>
+    </view>
+    <view class="record-foot"><view><text>操作人员</text><b>{{item.operatorName}}</b><text wx:if="{{item.operatorPhone}}">{{item.operatorPhone}}</text></view><text class="record-time">{{item.displayTime}}</text></view>
+  </view>
+</view>

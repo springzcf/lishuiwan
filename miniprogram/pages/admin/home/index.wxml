@@ -1,15 +1,35 @@
 <view class="page admin-page">
-  <view class="hero admin-hero"><view class="title">现场工作台</view><view>登录身份：{{member.nickname}} · {{member.staffRole==='admin'?'管理员':'核销员'}}</view></view>
-  <view class="section-title">本班次核销人</view>
-  <input class="field" value="{{operatorName}}" placeholder="请输入姓名或工号" bindinput="name"/>
-  <view class="section-title">本次核销人数 / 次数</view>
-  <view class="quantity-card">
-    <button class="quantity-btn" bindtap="decrease">-</button>
-    <input class="quantity-input" type="digit" value="{{verificationQuantity}}" bindinput="quantity"/>
-    <button class="quantity-btn" bindtap="increase">+</button>
+  <view class="hero admin-hero">
+    <view class="hero-eyebrow">STORE OPERATIONS</view>
+    <view class="title">现场工作台</view>
+    <view class="staff-line"><text class="online-dot"></text><text>{{member.nickname}} · {{member.staffRole==='admin'?'管理员':'核销员'}}</text></view>
   </view>
-  <view class="quantity-tip">例如 2 人同行，输入 2 后再扫码，一次扣减 2 次</view>
-  <button class="scan" bindtap="scan"><text class="scan-icon">▦</text><b>扫码核销 {{verificationQuantity||1}} 次</b><small>扫描顾客具体权益卡的动态核销码</small></button>
-  <button wx:if="{{member.staffRole==='admin'}}" class="cash" bindtap="cashIssue"><b>现场购卡 / 现金发卡</b><small>选择卡券后扫码，并使用管理员密码确认</small></button>
-  <view class="grid"><view class="card" data-url="/pages/admin/records/index" bindtap="go"><b>核销记录</b><text>查看当日与历史 ›</text></view><view wx:if="{{member.staffRole==='admin'}}" class="card" data-url="/pages/admin/report/index" bindtap="go"><b>数据速览</b><text>门店经营数据 ›</text></view></view>
+
+  <view class="section-head"><view><b>扫码核销</b><text>顾客到店使用权益</text></view><text class="frequency-tag">常用</text></view>
+  <view class="verify-panel card">
+    <view class="form-row quantity-row">
+      <view class="form-meta"><text class="form-icon quantity-icon">次</text><view><b>本次扣减</b><text>多人同行可一次扣减</text></view></view>
+      <view class="stepper">
+        <button class="quantity-btn" bindtap="decrease">−</button>
+        <input class="quantity-input" type="digit" value="{{verificationQuantity}}" bindinput="quantity"/>
+        <button class="quantity-btn" bindtap="increase">＋</button>
+      </view>
+    </view>
+    <button class="scan" bindtap="scan"><text class="scan-icon">▦</text><view><b>扫描权益卡核销码</b><small>本次将核销 {{verificationQuantity||1}} 次</small></view><text class="button-arrow">›</text></button>
+  </view>
+
+  <block wx:if="{{member.staffRole==='admin'}}">
+    <view class="section-head sales-head"><view><b>现场购卡</b><text>为顾客办理新卡</text></view></view>
+    <view class="cash-entry card" bindtap="cashIssue">
+      <view class="cash-icon">卡</view>
+      <view class="cash-main"><b>现场收款并发卡</b><text>选择卡券、扫描会员码、管理员授权</text></view>
+      <view class="entry-action">办理 <text>›</text></view>
+    </view>
+  </block>
+
+  <view class="section-head tools-head"><view><b>管理工具</b><text>记录查询与经营数据</text></view></view>
+  <view class="grid">
+    <view class="tool-card card" data-url="/pages/admin/records/index" bindtap="go"><view class="tool-icon">录</view><b>核销记录</b><text>查看当日与历史</text><view class="tool-arrow">›</view></view>
+    <view wx:if="{{member.staffRole==='admin'}}" class="tool-card card" data-url="/pages/admin/report/index" bindtap="go"><view class="tool-icon report-icon">数</view><b>数据速览</b><text>查看门店经营数据</text><view class="tool-arrow">›</view></view>
+  </view>
 </view>
