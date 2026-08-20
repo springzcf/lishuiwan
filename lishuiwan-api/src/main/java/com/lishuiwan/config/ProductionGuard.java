@@ -20,6 +20,12 @@ public class ProductionGuard {
           && (privateKeyPath == null || privateKeyPath.isBlank() || !Files.isReadable(Path.of(privateKeyPath)))) {
         throw new IllegalStateException("WeChat merchant private key is not readable");
       }
+      AppProperties.OfficialAccount oa=p.getWechat().getOfficialAccount();
+      if(oa.isEnabled()){
+        if(blank(oa.getAppId())||blank(oa.getAppSecret())||blank(oa.getOauthCallbackUrl())||blank(oa.getH5BaseUrl()))throw new IllegalStateException("Official account OAuth configuration is incomplete");
+        if(!oa.getOauthCallbackUrl().startsWith("https://")||!oa.getH5BaseUrl().startsWith("https://"))throw new IllegalStateException("Official account OAuth and H5 URLs must use HTTPS in prod");
+      }
     }
   }
+  private boolean blank(String value){return value==null||value.isBlank()||value.contains("change-me");}
 }

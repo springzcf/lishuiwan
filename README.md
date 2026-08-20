@@ -1,11 +1,12 @@
 # 丽水湾会员管理系统
 
-生产级单门店会员卡系统，包含微信原生小程序（顾客端 + 现场管理端）、Vue 3 Web 管理端、Spring Boot API、MySQL、Redis 与 Nginx。
+生产级单门店会员卡系统，包含微信原生小程序（顾客端 + 现场管理端）、移动 H5、Vue 3 Web 管理端、Spring Boot API、MySQL、Redis 与 Nginx。
 
 ## 目录
 
 - `lishuiwan-api/`：Java 17 / Spring Boot 3.5 后端，Flyway 自动建库，微信支付 APIv3。
 - `admin-web/`：Vue 3 / Element Plus 运营管理端。
+- `h5/`：Vue 3 移动端会员服务，复用小程序业务接口，可作为浏览器入口。
 - `miniprogram/`：微信原生小程序。
 - `deploy/`、`docker-compose.yml`：生产部署配置。
 - `docs/`：需求与详细设计文档。
@@ -21,20 +22,31 @@ mvn -s ../.mvn/settings.xml test
 cd ../admin-web
 pnpm install
 pnpm build
+
+cd ../h5
+npm ci
+npm run build
 ```
 
 小程序首次导入微信开发者工具后，执行“工具 → 构建 npm”，然后将 `project.config.json` 的 `appid` 与 `env.js` 的 `apiBase` 改为正式值。
 
 ## 生产部署
 
-1. 准备已备案域名、HTTPS 证书、微信小程序 AppID/AppSecret、微信支付商户号、APIv3 密钥、商户证书序列号和 `apiclient_key.pem`。
+云服务器首次部署、HTTPS 反向代理和一键更新步骤见 [`docs/云服务器一键部署.md`](docs/云服务器一键部署.md)。完成首次配置后，日常发布只需：
+
+```bash
+git pull --ff-only && sh scripts/deploy.sh
+```
+
+1. 准备已备案域名、HTTPS 证书、微信小程序及服务号 AppID/AppSecret、微信支付商户号、APIv3 密钥、商户证书序列号和 `apiclient_key.pem`。
 2. `cp .env.example .env`，生成强随机密码并替换所有占位值。
 3. 将商户私钥放到 `secrets/apiclient_key.pem`，权限设为仅部署用户可读。
 4. 配置 HTTPS：可在云负载均衡/CDN 终止 TLS；若由本机 Nginx 终止，参照 `deploy/nginx-ssl.conf.example` 挂载证书。
 5. 执行 `docker compose up -d --build`，确认 `docker compose ps` 中 MySQL、Redis、API 均为 healthy。
-6. 登录 `/admin/`，使用 `.env` 中的初始管理员账号配置商品、活动及小程序现场角色；创建正式管理员后应删除初始密码环境变量并轮换密码。
-7. 微信公众平台配置 request 合法域名和支付回调域名，均必须为 HTTPS；小程序 `env.js` 必须指向同一正式 API 域名。
-8. 如启用订阅消息，在微信后台申请核销/发卡模板，将模板 ID 同时写入 `.env` 与小程序 `env.js`；模板中的事项、时间字段名分别通过 `WECHAT_TEMPLATE_THING_KEY`、`WECHAT_TEMPLATE_TIME_KEY` 配置。
+6. 服务号“活动”和“我的”菜单分别使用 `/h5/activity`、`/h5/mine`；登录 `/admin/`，使用 `.env` 中的初始管理员账号配置商品、活动及现场角色；创建正式管理员后应删除初始密码环境变量并轮换密码。
+7. 按 [`docs/服务号H5上线指南.md`](docs/服务号H5上线指南.md) 绑定服务号与小程序、配置网页授权域名、服务号菜单和支付授权目录。
+8. 微信公众平台配置 request 合法域名和支付回调域名，均必须为 HTTPS；小程序 `env.js` 必须指向同一正式 API 域名。
+9. 如启用订阅消息，在微信后台申请核销/发卡模板，将模板 ID 同时写入 `.env` 与小程序 `env.js`；模板中的事项、时间字段名分别通过 `WECHAT_TEMPLATE_THING_KEY`、`WECHAT_TEMPLATE_TIME_KEY` 配置。
 
 生产配置会强制关闭开发登录和模拟支付；未提供安全的 JWT/数据库密码时，`prod` 启动会直接失败。微信参数会在首次调用微信能力时校验并返回明确错误。
 
@@ -46,7 +58,7 @@ pnpm build
 2. 模板部署会读取 `container.config.json`，创建 `lishuiwan` 数据库；服务启动后 Flyway 会自动创建和升级业务表。
 3. 云托管自动注入的 `MYSQL_ADDRESS`、`MYSQL_USERNAME`、`MYSQL_PASSWORD` 可直接被应用识别，也仍兼容原有的 `DB_URL`、`DB_USERNAME`、`DB_PASSWORD`。
 4. 首次部署可使用云数据库密码派生 JWT 签名密钥；正式运营请单独配置至少 32 字节的 `JWT_SECRET`。
-5. 使用微信登录前配置 `WECHAT_APP_ID`、`WECHAT_APP_SECRET`；使用验证码、订阅消息等功能还需配置可访问的 Redis：`REDIS_HOST`、`REDIS_PORT`、`REDIS_PASSWORD`。
+5. 使用微信登录前配置小程序 `WECHAT_APP_ID`、`WECHAT_APP_SECRET`；启用服务号 H5 时还要配置 `WECHAT_OFFICIAL_*` 与 `H5_BASE_URL`。OAuth 一次性票据和订阅消息需要可访问的 Redis：`REDIS_HOST`、`REDIS_PORT`、`REDIS_PASSWORD`。
 6. 如需初始化后台管理员，配置 `INITIAL_ADMIN_USERNAME`、长度至少 12 位的 `INITIAL_ADMIN_PASSWORD` 和可选的 `INITIAL_ADMIN_NAME`。
 
 手动上传代码包时，`container.config.json` 不会覆盖控制台已有的服务设置；请确认控制台端口仍为 `80`。容器本地文件不是持久存储，正式环境的上传文件应另接对象存储或持久卷。

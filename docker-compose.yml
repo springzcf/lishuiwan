@@ -42,7 +42,7 @@ services:
       context: .
       dockerfile: admin-web/Dockerfile
     restart: unless-stopped
-    ports: ["${HTTP_PORT:-80}:80"]
+    ports: ["${HTTP_BIND:-0.0.0.0}:${HTTP_PORT:-80}:80"]
     volumes: ["uploads:/data/static:ro"]
     depends_on:
       api: {condition: service_healthy}

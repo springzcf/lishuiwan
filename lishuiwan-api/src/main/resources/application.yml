@@ -64,6 +64,12 @@ lishuiwan:
     issue-template-id: ${WECHAT_ISSUE_TEMPLATE_ID:}
     template-thing-key: ${WECHAT_TEMPLATE_THING_KEY:thing1}
     template-time-key: ${WECHAT_TEMPLATE_TIME_KEY:time2}
+    official-account:
+      enabled: ${WECHAT_OFFICIAL_ENABLED:false}
+      app-id: ${WECHAT_OFFICIAL_APP_ID:}
+      app-secret: ${WECHAT_OFFICIAL_APP_SECRET:}
+      oauth-callback-url: ${WECHAT_OFFICIAL_OAUTH_CALLBACK_URL:}
+      h5-base-url: ${H5_BASE_URL:}
     pay:
       enabled: ${WECHAT_PAY_ENABLED:false}
       merchant-id: ${WECHAT_PAY_MCH_ID:}

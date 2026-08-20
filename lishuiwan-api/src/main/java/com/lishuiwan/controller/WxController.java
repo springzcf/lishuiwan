@@ -14,6 +14,7 @@ public class WxController {
   public record ProfileRequest(@Size(max=64) String nickname,@Size(max=255) String avatar,@Size(max=10) String birthday,@Size(max=255) String address){}
   public record CreateOrderRequest(@NotNull Long productId,@NotBlank String requestNo){}
   public record PayRequest(@NotBlank String requestNo){}
+  public record PrepayRequest(String channel){}
   @GetMapping("/home") public ApiResponse<Map<String,Object>> home(){return ApiResponse.ok(catalog.home());}
   @GetMapping("/products") public ApiResponse<List<Map<String,Object>>> products(){return ApiResponse.ok(catalog.products(true));}
   @GetMapping("/products/{id}") public ApiResponse<Map<String,Object>> product(@PathVariable long id){return ApiResponse.ok(catalog.product(id));}
@@ -22,7 +23,7 @@ public class WxController {
   @GetMapping("/member/code") public ApiResponse<Map<String,Object>> memberCode(){return ApiResponse.ok(codes.issue(RequestActor.memberId()));}
   @PostMapping("/orders") public ApiResponse<Map<String,Object>> createOrder(@Valid @RequestBody CreateOrderRequest r){return ApiResponse.ok(orders.create(RequestActor.memberId(),r.productId(),r.requestNo()));}
   @PostMapping("/orders/{orderNo}/mock-pay") public ApiResponse<Map<String,Object>> mockPay(@PathVariable String orderNo,@Valid @RequestBody PayRequest r){return ApiResponse.ok(orders.mockPay(RequestActor.memberId(),orderNo,r.requestNo()));}
-  @PostMapping("/orders/{orderNo}/prepay") public ApiResponse<Map<String,Object>> prepay(@PathVariable String orderNo){return ApiResponse.ok(wechatPay.prepay(RequestActor.memberId(),orderNo));}
+  @PostMapping("/orders/{orderNo}/prepay") public ApiResponse<Map<String,Object>> prepay(@PathVariable String orderNo,@RequestBody(required=false) PrepayRequest request){return ApiResponse.ok(wechatPay.prepay(RequestActor.memberId(),orderNo,request==null?null:request.channel()));}
   @GetMapping("/orders") public ApiResponse<List<Map<String,Object>>> orderList(){return ApiResponse.ok(orders.memberOrders(RequestActor.memberId()));}
   @GetMapping("/orders/{orderNo}") public ApiResponse<Map<String,Object>> order(@PathVariable String orderNo){OrderEntity o=orders.requireOrder(orderNo);if(!o.getMemberId().equals(RequestActor.memberId()))throw BizException.forbidden();return ApiResponse.ok(orders.view(o));}
   @GetMapping("/cards") public ApiResponse<List<Map<String,Object>>> cards(){return ApiResponse.ok(orders.memberCards(RequestActor.memberId()).stream().map(verification::cardView).toList());}

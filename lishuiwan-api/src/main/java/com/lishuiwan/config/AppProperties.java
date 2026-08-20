@@ -16,7 +16,15 @@ public class AppProperties {
   @Data public static class Wechat {
     private String appId; private String appSecret;
     private String verifyTemplateId; private String issueTemplateId; private String templateThingKey = "thing1"; private String templateTimeKey = "time2";
+    private final OfficialAccount officialAccount = new OfficialAccount();
     private final Pay pay = new Pay();
+  }
+  @Data public static class OfficialAccount {
+    private boolean enabled;
+    private String appId;
+    private String appSecret;
+    private String oauthCallbackUrl;
+    private String h5BaseUrl;
   }
   @Data public static class Pay {
     private boolean enabled; private String merchantId; private String merchantSerialNumber;

@@ -1,0 +1,9 @@
+{
+  "name": "丽水湾会员服务",
+  "short_name": "丽水湾",
+  "start_url": "/h5/",
+  "display": "standalone",
+  "background_color": "#f7f4ed",
+  "theme_color": "#123f36",
+  "icons": []
+}

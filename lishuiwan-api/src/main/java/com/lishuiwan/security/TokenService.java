@@ -10,6 +10,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -23,7 +24,7 @@ public class TokenService {
   }
   public String member(long id) { return issue(Long.toString(id), "member", Map.of(), properties.getJwt().getMemberExpireSeconds()); }
   public String admin(long id) { return issue(Long.toString(id), "admin", Map.of(), properties.getJwt().getAdminExpireSeconds()); }
-  public String registration(String openid) { return issue(openid, "registration", Map.of(), 300); }
+  public String registration(String openid,String unionid) { Map<String,Object> claims=new HashMap<>();if(unionid!=null)claims.put("unionid",unionid);return issue(openid,"registration",claims,300); }
   private String issue(String subject, String type, Map<String,Object> claims, long seconds) {
     Instant now = Instant.now();
     return Jwts.builder().subject(subject).claim("type", type).claims(claims).issuedAt(Date.from(now)).expiration(Date.from(now.plusSeconds(seconds))).signWith(key).compact();
