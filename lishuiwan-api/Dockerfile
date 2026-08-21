@@ -1,16 +1,17 @@
-FROM maven:3.9.9-eclipse-temurin-17 AS build
+ARG MAVEN_BASE_IMAGE=public.ecr.aws/docker/library/maven:3.9.16-amazoncorretto-17-alpine
+ARG JAVA_RUNTIME_IMAGE=public.ecr.aws/docker/library/amazoncorretto:17-alpine
+
+FROM ${MAVEN_BASE_IMAGE} AS build
 WORKDIR /build
 COPY settings.xml pom.xml ./
 RUN mvn -B -q -s /build/settings.xml dependency:go-offline
 COPY src ./src
 RUN mvn -B -q -s /build/settings.xml clean package
 
-FROM eclipse-temurin:17-jre-jammy
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && groupadd --system app \
-    && useradd --system --gid app app \
+FROM ${JAVA_RUNTIME_IMAGE}
+RUN apk add --no-cache curl \
+    && addgroup -S app \
+    && adduser -S -D -H -G app app \
     && mkdir -p /app/data/uploads \
     && chown -R app:app /app
 WORKDIR /app
