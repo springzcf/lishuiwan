@@ -41,7 +41,7 @@ git pull --ff-only && sh scripts/deploy.sh
 1. 准备已备案域名、HTTPS 证书、微信小程序及服务号 AppID/AppSecret、微信支付商户号、APIv3 密钥、商户证书序列号和 `apiclient_key.pem`。
 2. `cp .env.example .env`，生成强随机密码并替换所有占位值。
 3. 将商户私钥放到 `secrets/apiclient_key.pem`，权限设为仅部署用户可读。
-4. 首次执行 `sudo sh scripts/install-host.sh`，安装 Java 17、Maven、Node.js、Nginx 和 systemd 服务；在 `.env` 填写证书路径。
+4. 首次使用普通部署用户执行 `sh scripts/install-host.sh`，安装 Java 17、Maven、Node.js、Nginx 和 systemd 服务；脚本会按需调用 `sudo`，不要给整个命令加 `sudo`。
 5. 执行 `sh scripts/deploy.sh`；Docker 只启动 MySQL、Redis，API 由宿主机 systemd 运行，静态网页由宿主机 Nginx 提供。
 6. 服务号“活动”和“我的”菜单分别使用 `/h5/activity`、`/h5/mine`；登录 `/admin/`，使用 `.env` 中的初始管理员账号配置商品、活动及现场角色；创建正式管理员后应删除初始密码环境变量并轮换密码。
 7. 按 [`docs/服务号H5上线指南.md`](docs/服务号H5上线指南.md) 绑定服务号与小程序、配置网页授权域名、服务号菜单和支付授权目录。

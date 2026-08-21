@@ -16,6 +16,10 @@ as_root() {
 }
 escape_sed() { printf '%s' "$1" | sed 's/[|&\\]/\\&/g'; }
 
+if [ "$(id -u)" -eq 0 ] && [ -n "${SUDO_USER:-}" ]; then
+  fail "请使用普通部署用户执行：sh scripts/install-host.sh；脚本会在需要时单独调用 sudo。整体使用 sudo 会看不到该用户的 Node.js"
+fi
+
 [ -f "$env_file" ] || fail "缺少 $env_file，请先复制 .env.example 并填写配置"
 command -v docker >/dev/null 2>&1 || fail "未安装 Docker；Docker 只用于 MySQL 和 Redis"
 docker compose version >/dev/null 2>&1 || fail "未安装 Docker Compose v2"

@@ -16,7 +16,7 @@ as_root() {
 escape_sed() { printf '%s' "$1" | sed 's/[|&\\]/\\&/g'; }
 
 [ -f "$env_file" ] || fail "缺少 $env_file"
-command -v nginx >/dev/null 2>&1 || fail "未安装 Nginx，请先运行 sudo sh scripts/install-host.sh"
+command -v nginx >/dev/null 2>&1 || fail "未安装 Nginx，请先使用普通部署用户运行 sh scripts/install-host.sh"
 
 domain=$(env_value PUBLIC_DOMAIN)
 api_port=$(env_value SERVER_PORT)
