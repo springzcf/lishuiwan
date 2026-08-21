@@ -37,6 +37,7 @@ docker info >/dev/null 2>&1 || fail "当前用户无权访问 Docker，请加入
 java -version 2>&1 | grep -Eq 'version "17[.]|openjdk 17[.]' || fail "生产 API 必须使用 Java 17"
 node -e 'const [a,b]=process.versions.node.split(".").map(Number);process.exit(a>20||(a===20&&b>=19)?0:1)' || fail "前端构建需要 Node.js >= 20.19，建议使用 Node.js 22"
 as_root test -f /etc/systemd/system/lishuiwan-api.service || fail "systemd 服务未安装，请先运行 sudo sh scripts/install-host.sh"
+info "宿主机依赖校验通过；deploy.sh 不重复安装 Java、Maven、Node.js 或 Nginx"
 
 for key in DB_PASSWORD MYSQL_ROOT_PASSWORD REDIS_PASSWORD JWT_SECRET PUBLIC_DOMAIN SERVER_ADDRESS DB_URL DB_USERNAME REDIS_HOST UPLOAD_DIR; do
   require_value "$key"

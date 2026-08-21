@@ -20,16 +20,68 @@ escape_sed() { printf '%s' "$1" | sed 's/[|&\\]/\\&/g'; }
 command -v docker >/dev/null 2>&1 || fail "未安装 Docker；Docker 只用于 MySQL 和 Redis"
 docker compose version >/dev/null 2>&1 || fail "未安装 Docker Compose v2"
 
-info "安装 Java 17 JDK、Maven、Nginx 与基础工具"
-if command -v apt-get >/dev/null 2>&1; then
-  as_root apt-get update
-  as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-17-jdk-headless maven nginx curl ca-certificates xz-utils
-elif command -v dnf >/dev/null 2>&1; then
-  as_root dnf install -y java-17-openjdk-devel maven nginx curl ca-certificates xz
-elif command -v yum >/dev/null 2>&1; then
-  as_root yum install -y java-17-openjdk-devel maven nginx curl ca-certificates xz
+java_ok=false
+if command -v java >/dev/null 2>&1 && command -v javac >/dev/null 2>&1 \
+    && java -version 2>&1 | grep -Eq 'version "17[.]|openjdk 17[.]' \
+    && javac -version 2>&1 | grep -Eq '^javac 17[.]'; then
+  java_ok=true
+fi
+
+maven_ok=false
+if command -v mvn >/dev/null 2>&1; then
+  detected_maven_version=$(mvn -version 2>/dev/null | awk 'NR == 1 { print $3 }')
+  detected_maven_major=$(printf '%s' "$detected_maven_version" | awk -F. '{print $1}')
+  detected_maven_minor=$(printf '%s' "$detected_maven_version" | awk -F. '{print $2}')
+  case "$detected_maven_major.$detected_maven_minor" in
+    .|*[!0-9.]*) ;;
+    *)
+      if [ "$detected_maven_major" -gt 3 ] || { [ "$detected_maven_major" -eq 3 ] && [ "$detected_maven_minor" -ge 6 ]; }; then
+        maven_ok=true
+      fi
+      ;;
+  esac
+fi
+
+nginx_ok=false
+command -v nginx >/dev/null 2>&1 && nginx_ok=true
+curl_ok=false
+command -v curl >/dev/null 2>&1 && curl_ok=true
+xz_ok=false
+command -v xz >/dev/null 2>&1 && xz_ok=true
+
+if [ "$java_ok" = true ] && [ "$maven_ok" = true ] && [ "$nginx_ok" = true ] \
+    && [ "$curl_ok" = true ] && [ "$xz_ok" = true ]; then
+  info "Java 17 JDK、Maven、Nginx、curl、xz 已安装，跳过系统软件安装"
 else
-  fail "不支持当前软件包管理器，请手动安装 Java 17 JDK、Maven、Nginx、curl 和 xz"
+  info "仅安装缺失或版本不符合要求的宿主机软件"
+  if command -v apt-get >/dev/null 2>&1; then
+    set --
+    [ "$java_ok" = true ] || set -- "$@" openjdk-17-jdk-headless
+    [ "$maven_ok" = true ] || set -- "$@" maven
+    [ "$nginx_ok" = true ] || set -- "$@" nginx
+    [ "$curl_ok" = true ] || set -- "$@" curl ca-certificates
+    [ "$xz_ok" = true ] || set -- "$@" xz-utils
+    as_root apt-get update
+    as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y "$@"
+  elif command -v dnf >/dev/null 2>&1; then
+    set --
+    [ "$java_ok" = true ] || set -- "$@" java-17-openjdk-devel
+    [ "$maven_ok" = true ] || set -- "$@" maven
+    [ "$nginx_ok" = true ] || set -- "$@" nginx
+    [ "$curl_ok" = true ] || set -- "$@" curl ca-certificates
+    [ "$xz_ok" = true ] || set -- "$@" xz
+    as_root dnf install -y "$@"
+  elif command -v yum >/dev/null 2>&1; then
+    set --
+    [ "$java_ok" = true ] || set -- "$@" java-17-openjdk-devel
+    [ "$maven_ok" = true ] || set -- "$@" maven
+    [ "$nginx_ok" = true ] || set -- "$@" nginx
+    [ "$curl_ok" = true ] || set -- "$@" curl ca-certificates
+    [ "$xz_ok" = true ] || set -- "$@" xz
+    as_root yum install -y "$@"
+  else
+    fail "不支持当前软件包管理器，请手动安装缺失的 Java 17 JDK、Maven、Nginx、curl 或 xz"
+  fi
 fi
 
 java -version 2>&1 | grep -Eq 'version "17[.]|openjdk 17[.]' || fail "当前 java 不是 Java 17"
@@ -76,7 +128,13 @@ if [ "$node_ok" != true ]; then
   done
   rm -rf "$temp_dir"
   trap - EXIT HUP INT TERM
+else
+  info "Node.js $(node --version) 已满足要求，跳过 Node.js 安装"
 fi
+
+node -e 'const [a,b]=process.versions.node.split(".").map(Number);process.exit(a>20||(a===20&&b>=19)?0:1)' \
+  || fail "Node.js 安装后版本仍不符合要求"
+command -v npm >/dev/null 2>&1 && command -v npx >/dev/null 2>&1 || fail "npm 或 npx 不可用"
 
 app_user=$(env_value APP_RUN_USER)
 app_user=${app_user:-${SUDO_USER:-$(id -un)}}
