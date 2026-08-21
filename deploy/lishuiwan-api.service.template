@@ -1,0 +1,35 @@
+[Unit]
+Description=Lishuiwan Spring Boot API
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=__APP_USER__
+Group=__APP_GROUP__
+WorkingDirectory=__PROJECT_DIR__
+Environment=TZ=Asia/Shanghai
+Environment=JAVA_XMS=256m
+Environment=JAVA_XMX=1024m
+EnvironmentFile=__PROJECT_DIR__/.env
+ExecStart=__JAVA_BIN__ -Xms${JAVA_XMS} -Xmx${JAVA_XMX} -Djava.security.egd=file:/dev/urandom -jar __PROJECT_DIR__/current/api.jar --spring.profiles.active=prod
+Restart=on-failure
+RestartSec=5s
+SuccessExitStatus=143
+TimeoutStopSec=45s
+UMask=0027
+
+# 基础系统隔离。API 只需要写入 data 目录，配置、代码和私钥均保持只读。
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+ReadWritePaths=__PROJECT_DIR__/data
+
+[Install]
+WantedBy=multi-user.target

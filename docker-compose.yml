@@ -9,6 +9,8 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       TZ: Asia/Shanghai
     command: ["--character-set-server=utf8mb4","--collation-server=utf8mb4_0900_ai_ci","--default-time-zone=+08:00"]
+    # 只允许宿主机上的 Java 进程访问，禁止将数据库端口暴露到公网。
+    ports: ["127.0.0.1:${MYSQL_PORT:-3306}:3306"]
     volumes: ["mysql_data:/var/lib/mysql"]
     healthcheck: {test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"], interval: 10s, timeout: 5s, retries: 10}
     networks: [internal]
@@ -16,43 +18,10 @@ services:
     image: ${REDIS_BASE_IMAGE:-redis:7.4-alpine}
     restart: unless-stopped
     command: ["redis-server","--appendonly","yes","--requirepass","${REDIS_PASSWORD}"]
+    # 只允许宿主机上的 Java 进程访问，禁止将 Redis 端口暴露到公网。
+    ports: ["127.0.0.1:${REDIS_PORT:-6379}:6379"]
     volumes: ["redis_data:/data"]
     healthcheck: {test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"], interval: 10s, timeout: 5s, retries: 10}
     networks: [internal]
-  api:
-    build:
-      context: ./lishuiwan-api
-      args:
-        MAVEN_BASE_IMAGE: ${MAVEN_BASE_IMAGE:-public.ecr.aws/docker/library/maven:3.9.16-amazoncorretto-17-alpine}
-        JAVA_RUNTIME_IMAGE: ${JAVA_RUNTIME_IMAGE:-public.ecr.aws/docker/library/amazoncorretto:17-alpine}
-    restart: unless-stopped
-    env_file: ${APP_ENV_FILE:-.env}
-    environment:
-      SERVER_PORT: 8080
-      DB_URL: jdbc:mysql://mysql:3306/lishuiwan?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
-      DB_USERNAME: lishuiwan
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      UPLOAD_DIR: /app/data/uploads
-      UPLOAD_URL_PREFIX: /static/
-    volumes: ["uploads:/app/data/uploads", "./secrets:/run/secrets:ro"]
-    depends_on:
-      mysql: {condition: service_healthy}
-      redis: {condition: service_healthy}
-    healthcheck: {test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health/readiness"], interval: 15s, timeout: 5s, retries: 10}
-    networks: [internal]
-  web:
-    build:
-      context: .
-      dockerfile: admin-web/Dockerfile
-      args:
-        NODE_BASE_IMAGE: ${NODE_BASE_IMAGE:-node:24-alpine}
-        NGINX_BASE_IMAGE: ${NGINX_BASE_IMAGE:-nginx:1.28-alpine}
-    restart: unless-stopped
-    ports: ["${HTTP_BIND:-0.0.0.0}:${HTTP_PORT:-80}:80"]
-    volumes: ["uploads:/data/static:ro"]
-    depends_on:
-      api: {condition: service_healthy}
-    networks: [internal]
 networks: {internal: {}}
-volumes: {mysql_data: {}, redis_data: {}, uploads: {}}
+volumes: {mysql_data: {}, redis_data: {}}

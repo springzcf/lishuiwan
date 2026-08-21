@@ -8,4 +8,10 @@ secrets/
 miniprogram/env.local.js
 miniprogram/miniprogram_npm/
 data/
+backups/
+releases/
+current
+.current-*
+.rollback-*
+.restore-*
 *.log

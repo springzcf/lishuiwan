@@ -1,0 +1,47 @@
+# 证书尚未配置时使用的临时 HTTP 配置。微信网页授权和支付上线前必须切换 HTTPS。
+limit_req_zone $binary_remote_addr zone=lishuiwan_auth_limit:10m rate=10r/m;
+
+server {
+  listen 80;
+  server_name __PUBLIC_DOMAIN__;
+  server_tokens off;
+  client_max_body_size 6m;
+
+  add_header X-Content-Type-Options nosniff always;
+  add_header X-Frame-Options SAMEORIGIN always;
+  add_header Referrer-Policy strict-origin-when-cross-origin always;
+  add_header Permissions-Policy "camera=(self), microphone=(), geolocation=()" always;
+  add_header Content-Security-Policy "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'self'" always;
+
+  location = / { return 302 /h5/activity; }
+  location /h5/ {
+    root __PROJECT_DIR__/current;
+    try_files $uri $uri/ /h5/index.html;
+  }
+  location /admin/ {
+    root __PROJECT_DIR__/current;
+    try_files $uri $uri/ /admin/index.html;
+  }
+  location ~ ^/(h5|admin)/assets/ {
+    root __PROJECT_DIR__/current;
+    expires 30d;
+    add_header Cache-Control "public, immutable";
+    try_files $uri =404;
+  }
+
+  location ~ ^/api/public/(admin/login|wx/login|wx/phone|h5/wechat/(authorize|callback|exchange))$ {
+    limit_req zone=lishuiwan_auth_limit burst=5 nodelay;
+    limit_req_status 429;
+    proxy_pass http://127.0.0.1:__API_PORT__;
+    include __PROXY_PARAMS__;
+  }
+  location /api/ {
+    proxy_pass http://127.0.0.1:__API_PORT__;
+    include __PROXY_PARAMS__;
+  }
+  location /static/ {
+    proxy_pass http://127.0.0.1:__API_PORT__;
+    include __PROXY_PARAMS__;
+  }
+  location /actuator/ { return 404; }
+}

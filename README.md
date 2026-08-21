@@ -8,7 +8,7 @@
 - `admin-web/`：Vue 3 / Element Plus 运营管理端。
 - `h5/`：Vue 3 移动端会员服务，复用小程序业务接口，可作为浏览器入口。
 - `miniprogram/`：微信原生小程序。
-- `deploy/`、`docker-compose.yml`：生产部署配置。
+- `deploy/`、`scripts/`：宿主机 systemd/Nginx 配置与发布脚本；`docker-compose.yml` 仅运行 MySQL、Redis。
 - `docs/`：需求与详细设计文档。
 
 ## 本地验证
@@ -41,8 +41,8 @@ git pull --ff-only && sh scripts/deploy.sh
 1. 准备已备案域名、HTTPS 证书、微信小程序及服务号 AppID/AppSecret、微信支付商户号、APIv3 密钥、商户证书序列号和 `apiclient_key.pem`。
 2. `cp .env.example .env`，生成强随机密码并替换所有占位值。
 3. 将商户私钥放到 `secrets/apiclient_key.pem`，权限设为仅部署用户可读。
-4. 配置 HTTPS：可在云负载均衡/CDN 终止 TLS；若由本机 Nginx 终止，参照 `deploy/nginx-ssl.conf.example` 挂载证书。
-5. 执行 `docker compose up -d --build`，确认 `docker compose ps` 中 MySQL、Redis、API 均为 healthy。
+4. 首次执行 `sudo sh scripts/install-host.sh`，安装 Java 17、Maven、Node.js、Nginx 和 systemd 服务；在 `.env` 填写证书路径。
+5. 执行 `sh scripts/deploy.sh`；Docker 只启动 MySQL、Redis，API 由宿主机 systemd 运行，静态网页由宿主机 Nginx 提供。
 6. 服务号“活动”和“我的”菜单分别使用 `/h5/activity`、`/h5/mine`；登录 `/admin/`，使用 `.env` 中的初始管理员账号配置商品、活动及现场角色；创建正式管理员后应删除初始密码环境变量并轮换密码。
 7. 按 [`docs/服务号H5上线指南.md`](docs/服务号H5上线指南.md) 绑定服务号与小程序、配置网页授权域名、服务号菜单和支付授权目录。
 8. 微信公众平台配置 request 合法域名和支付回调域名，均必须为 HTTPS；小程序 `env.js` 必须指向同一正式 API 域名。
@@ -78,5 +78,5 @@ gzip -dc backups/lishuiwan_YYYYMMDD_HHMMSS.sql.gz | docker compose exec -T mysql
 - `.env`、`secrets/` 未进入版本库，JWT/数据库/Redis 密码均为独立强随机值。
 - `MOCK_PAYMENT_ENABLED=false`、`DEV_LOGIN_ENABLED=false`。
 - 微信支付回调可公网访问，回调签名、商户号、AppID、金额均由后端校验。
-- 管理端只通过 HTTPS 访问，服务器防火墙不公开 MySQL、Redis、API 容器端口。
+- 管理端只通过 HTTPS 访问，服务器防火墙不公开 MySQL、Redis 和宿主机 API 端口。
 - 已创建监控告警、每日备份和恢复演练记录。
